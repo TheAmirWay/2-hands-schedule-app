@@ -1,4 +1,4 @@
-2 Hands PHX – Employee Schedule Builder
+2 Hands – Employee Schedule Builder
 A mobile-first web app built for a real small business to automate weekly employee scheduling across two restaurant locations. What used to take hours of manual work now takes under 10 minutes.
 🔗 Live App: https://2handsschedule.netlify.app/
 The Problem
