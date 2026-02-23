@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>2 Hands – Schedule</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --black: #0e0e0e;
+  --gold: #e8b84b;
+  --gold2: #c99a2e;
+  --cream: #f7f3ec;
+  --white: #ffffff;
+  --gray: #6b6b6b;
+  --light: #ede8df;
+  --red: #d63031;
+  --green: #00b894;
+  --blue: #5c6bc0;
+  --chip-opener: #fff7e0;
+  --chip-opener-b: #d4a030;
+  --chip-opener-t: #6b4c00;
+  --chip-mid: #e8f4e8;
+  --chip-mid-b: #4caf50;
+  --chip-mid-t: #1b5e20;
+  --chip-late: #ede8f6;
+  --chip-late-b: #7c6bc0;
+  --chip-late-t: #2a1a6e;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--black);font-size:15px}
+
+/* ── TOP NAV ── */
+.nav{background:var(--black);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:50}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--white);letter-spacing:1px;line-height:1}
+.nav-logo span{color:var(--gold)}
+.nav-loc{display:flex;gap:6px}
+.loc-btn{padding:6px 14px;border:2px solid transparent;background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:20px;transition:all .2s}
+.loc-btn.active{background:var(--gold);color:var(--black);border-color:var(--gold)}
+
+/* ── HERO ACTION BAR ── */
+.action-bar{background:var(--black);padding:0 20px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.week-nav{display:flex;align-items:center;gap:8px;flex:1;min-width:200px}
+.week-label{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);letter-spacing:1px;white-space:nowrap}
+.icon-btn{width:34px;height:34px;border:2px solid rgba(255,255,255,.2);background:none;color:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;border-radius:6px;transition:all .15s;flex-shrink:0}
+.icon-btn:hover{border-color:var(--gold);color:var(--gold)}
+.gen-btn{padding:0 20px;height:42px;background:var(--gold);border:none;color:var(--black);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:8px;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.gen-btn:hover{background:var(--gold2);transform:translateY(-1px)}
+.gen-btn:active{transform:translateY(0)}
+.gen-btn .spin{display:inline-block;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.export-btn{padding:0 14px;height:42px;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:8px;transition:all .15s;white-space:nowrap}
+.export-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── TABS ── */
+.tabs{background:var(--white);border-bottom:2px solid var(--light);display:flex;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:12px 20px;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif}
+.tab.active{color:var(--black);border-bottom-color:var(--gold)}
+
+/* ── MAIN ── */
+.main{padding:16px}
+
+/* ── SCHEDULE TABLE ── */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,.08)}
+table{width:100%;border-collapse:collapse;background:var(--white);min-width:560px}
+thead tr{background:var(--black)}
+th{padding:10px 6px;text-align:center;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.7);line-height:1.4}
+th:first-child{text-align:left;padding-left:14px;min-width:95px;color:var(--white)}
+th .day-name{color:var(--white);display:block}
+th .day-date{color:rgba(255,255,255,.45);font-size:9px;display:block}
+th .closer-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:9px;font-weight:800;margin-top:3px}
+.cb-ok{background:#00b89422;color:#00b894}
+.cb-warn{background:#fdcb6e22;color:#e17055}
+.cb-bad{background:#d6303122;color:#d63031}
+tbody tr{border-bottom:1px solid #f0ebe0;transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover td{background:#faf7f2}
+td{padding:7px 4px;text-align:center;vertical-align:middle}
+td:first-child{text-align:left;padding-left:14px}
+.emp-name{font-weight:700;font-size:13px;display:block}
+.emp-stations{font-size:9px;color:var(--gray);margin-top:1px}
+.chip{display:inline-flex;flex-direction:column;align-items:center;padding:3px 7px;border-radius:6px;border:1.5px solid;font-size:10px;font-weight:700;font-family:monospace;line-height:1.35;cursor:pointer;transition:filter .15s;min-width:50px}
+.chip:hover{filter:brightness(.9)}
+.chip-time{font-size:10px}
+.chip-stn{font-size:9px;opacity:.75}
+.chip-opener{background:var(--chip-opener);border-color:var(--chip-opener-b);color:var(--chip-opener-t)}
+.chip-mid{background:var(--chip-mid);border-color:var(--chip-mid-b);color:var(--chip-mid-t)}
+.chip-late{background:var(--chip-late);border-color:var(--chip-late-b);color:var(--chip-late-t)}
+.add-btn{color:#d0c8bc;font-size:20px;cursor:pointer;transition:color .15s;display:inline-block;width:100%;text-align:center}
+.add-btn:hover{color:var(--gold)}
+.off-lbl{color:#ddd;font-size:10px}
+.hrs-cell{white-space:nowrap}
+.hrs-num{font-weight:700;font-size:12px}
+.hrs-bar{height:4px;background:var(--light);border-radius:2px;margin-top:3px;min-width:36px}
+.hrs-fill{height:4px;background:var(--gold);border-radius:2px}
+.over-lbl{color:var(--red);font-size:9px;font-weight:800}
+.summary-row td{background:#f7f3ec !important;padding:6px 4px}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:48px 20px;color:var(--gray)}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-title{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--black);margin-bottom:6px;letter-spacing:1px}
+.empty-sub{font-size:14px;line-height:1.5}
+.empty-gen-btn{margin-top:20px;padding:14px 32px;background:var(--gold);border:none;color:var(--black);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:8px}
+
+/* ── LEGEND ── */
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;font-size:11px;align-items:center}
+.legend-item{display:flex;align-items:center;gap:5px}
+.legend-dot{width:10px;height:10px;border-radius:3px;border:2px solid}
+
+/* ── EMPLOYEES ── */
+.emp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.emp-card{background:var(--white);border-radius:10px;padding:16px;box-shadow:0 1px 8px rgba(0,0,0,.06);border:2px solid transparent;transition:border-color .15s}
+.emp-card:hover{border-color:var(--light)}
+.emp-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.emp-card-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.5px}
+.emp-card-meta{font-size:11px;color:var(--gray);margin-top:1px}
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;margin-left:4px}
+.badge-opener{background:#fff7e0;color:#6b4c00;border:1px solid #d4a030}
+.badge-closer{background:#ede8f6;color:#2a1a6e;border:1px solid #7c6bc0}
+.badge-noclose{background:#e8f4e8;color:#1b5e20;border:1px solid #4caf50}
+.avail-dots{display:flex;gap:6px;margin-top:10px}
+.avail-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:3px}
+.avail-dot{width:10px;height:10px;border-radius:50%}
+.avail-on{background:var(--green)}
+.avail-off{background:var(--light)}
+.avail-lbl{font-size:9px;color:var(--gray)}
+.card-btns{display:flex;gap:6px}
+.card-btn{padding:5px 12px;border:2px solid var(--light);background:none;cursor:pointer;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;border-radius:6px;transition:all .15s}
+.card-btn:hover{border-color:var(--black)}
+.card-btn-del{border-color:#ffd0d0;color:var(--red)}
+.card-btn-del:hover{background:var(--red);border-color:var(--red);color:var(--white)}
+
+/* ── EDIT FIELDS ── */
+.field{margin-bottom:12px}
+.field label{display:block;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:5px}
+.field input{width:100%;padding:8px 12px;border:2px solid var(--light);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:14px;background:var(--cream);outline:none;transition:border-color .15s}
+.field input:focus{border-color:var(--black)}
+.toggle-row{display:flex;flex-wrap:wrap;gap:6px}
+.toggle-btn{padding:5px 12px;border:2px solid var(--light);background:none;cursor:pointer;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;border-radius:6px;transition:all .15s}
+.toggle-btn.on{background:var(--black);color:var(--gold);border-color:var(--black)}
+.day-toggle{padding:4px 9px;border:2px solid var(--light);background:none;cursor:pointer;font-size:10px;font-weight:700;font-family:'DM Sans',sans-serif;border-radius:6px;transition:all .15s}
+.day-toggle.on{background:var(--green);color:var(--white);border-color:var(--green)}
+.day-toggle.ov{background:var(--gold);border-color:var(--gold);color:var(--black)}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:flex;align-items:flex-end;justify-content:center;padding:0}
+@media(min-width:600px){.overlay{align-items:center;padding:20px}}
+.modal{background:var(--white);width:100%;max-width:460px;border-radius:16px 16px 0 0;padding:24px 22px;max-height:90vh;overflow-y:auto}
+@media(min-width:600px){.modal{border-radius:16px}}
+.modal-handle{width:40px;height:4px;background:var(--light);border-radius:2px;margin:0 auto 18px}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;margin-bottom:3px}
+.modal-sub{font-size:12px;color:var(--gray);margin-bottom:18px}
+.tpl-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tpl-btn{padding:6px 12px;border:2px solid var(--light);background:none;cursor:pointer;font-size:11px;font-family:'DM Sans',sans-serif;border-radius:6px;transition:all .15s}
+.tpl-btn:hover,.tpl-btn.on{background:var(--cream);font-weight:700}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.shift-preview{font-family:monospace;font-size:14px;font-weight:700;padding:8px 14px;background:var(--cream);border-radius:7px;margin-bottom:14px;border-left:3px solid var(--gold)}
+.modal-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.btn-save{padding:10px 22px;background:var(--black);color:var(--white);border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border-radius:8px}
+.btn-clear{padding:10px 18px;background:none;color:var(--red);border:2px solid #ffd0d0;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border-radius:8px}
+.btn-cancel{padding:10px 18px;background:none;color:var(--gray);border:2px solid var(--light);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;border-radius:8px}
+
+/* ── ADD EMP FORM ── */
+.add-form{background:var(--white);border-radius:10px;padding:18px;margin-bottom:16px;border:2px dashed var(--light)}
+.add-form-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:14px}
+.btn-add-emp{padding:10px 22px;background:var(--black);color:var(--white);border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border-radius:8px;margin-top:4px}
+
+/* ── EXPORT PANEL ── */
+.export-panel{background:var(--black);padding:14px 20px;border-top:1px solid rgba(255,255,255,.1)}
+.export-panel-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.exp-btn{padding:9px 16px;border:2px solid rgba(255,255,255,.2);background:none;color:rgba(255,255,255,.8);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border-radius:8px;transition:all .15s;white-space:nowrap}
+.exp-btn:hover{border-color:var(--gold);color:var(--gold)}
+.exp-csv{background:var(--cream);border-radius:8px;padding:10px 12px;font-family:monospace;font-size:11px;color:var(--black);max-height:140px;overflow-y:auto;white-space:pre;line-height:1.6;cursor:text}
+.exp-tip{font-size:11px;color:rgba(255,255,255,.35);margin-top:8px}
+
+/* ── AVAIL TAB ── */
+.avail-table-wrap{overflow-x:auto;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,.08)}
+
+/* ── SECTION TITLE ── */
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.5px;margin-bottom:14px}
+
+/* ── STATION LEGEND ── */
+.stn-legend{font-size:11px;color:var(--gray);background:var(--white);padding:10px 14px;border-radius:8px;margin-top:12px;line-height:1.8}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--black);color:var(--white);padding:12px 22px;border-radius:30px;font-size:13px;font-weight:600;z-index:500;transition:transform .3s;pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+@media print{
+  .nav,.action-bar,.tabs,.legend,.export-panel,.stn-legend,.no-print{display:none!important}
+  .main{padding:0}
+  .table-wrap{box-shadow:none}
+  table{min-width:unset}
+  .chip{font-size:9px;min-width:40px;padding:2px 4px}
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">2 <span>Hands</span></div>
+  <div class="nav-loc">
+    <button class="loc-btn active" id="btn-phx" onclick="switchLocation('phx')">PHX</button>
+    <button class="loc-btn" id="btn-mesa" onclick="switchLocation('mesa')">MESA</button>
+  </div>
+</nav>
+
+<!-- ACTION BAR -->
+<div class="action-bar">
+  <div class="week-nav">
+    <button class="icon-btn" onclick="prevWeek()">←</button>
+    <div class="week-label" id="week-label">––</div>
+    <button class="icon-btn" onclick="nextWeek()">→</button>
+  </div>
+  <button class="gen-btn" id="gen-btn" onclick="generate()" title="Tap again for a different schedule!">⚡ Auto-Generate</button>
+  <button class="export-btn" onclick="toggleExport()">↓ Export</button>
+</div>
+
+<!-- EXPORT PANEL -->
+<div class="export-panel" id="export-panel" style="display:none">
+  <div class="export-panel-row">
+    <button class="exp-btn" onclick="downloadCSV()">⬇ Download CSV</button>
+    <button class="exp-btn" onclick="copyCSV()">📋 Copy CSV</button>
+    <button class="exp-btn" onclick="openPrint()">🖨 Print / PDF</button>
+    <button class="exp-btn" style="border-color:rgba(255,255,255,.1);color:rgba(255,255,255,.35)" onclick="toggleExport()">✕ Close</button>
+  </div>
+  <div class="exp-csv" id="exp-csv" onclick="this.focus();document.execCommand('selectAll')"></div>
+  <div class="exp-tip">💡 Click the CSV text above to select all, then copy — or use the buttons</div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" id="tab-schedule" onclick="switchTab('schedule')">📅 Schedule</button>
+  <button class="tab" id="tab-employees" onclick="switchTab('employees')">👥 Team</button>
+  <button class="tab" id="tab-availability" onclick="switchTab('availability')">🗓 This Week</button>
+</div>
+
+<div class="main" id="main"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
+const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const CLOSE = 21;
+const LATE_MID_DAYS = ["Mon","Tue"];
+const STATIONS = ["C","R","T","BS","FS","P","B"];
+const STATION_LABELS = {C:"Cashier",R:"Rolling",T:"Toppings",BS:"Back Support",FS:"Front Support",P:"Prep",B:"Boba"};
+
+const SHIFT_TEMPLATES = [
+  {desc:"9:30–4pm",  start:9.5, end:16},
+  {desc:"9:30–5pm",  start:9.5, end:17},
+  {desc:"11–4pm",    start:11,  end:16},
+  {desc:"11–5pm",    start:11,  end:17},
+  {desc:"11:30–4pm", start:11.5,end:16},
+  {desc:"11:30–5pm", start:11.5,end:17},
+  {desc:"12–4pm",    start:12,  end:16},
+  {desc:"12–5pm",    start:12,  end:17},
+  {desc:"11–close",  start:11,  end:21},
+  {desc:"11:30–close",start:11.5,end:21},
+  {desc:"12–close",  start:12,  end:21},
+  {desc:"3–close",   start:15,  end:21},
+  {desc:"4–close",   start:16,  end:21},
+  {desc:"5–close",   start:17,  end:21},
+  {desc:"9:30–1pm",  start:9.5, end:13},
+  {desc:"9:30–3pm",  start:9.5, end:15},
+  {desc:"10–6pm",    start:10,  end:18},
+  {desc:"12–4pm",    start:12,  end:16},
+  {desc:"4–8pm",     start:16,  end:20},
+  {desc:"2pm–8pm",   start:14,  end:20},
+];
+
+const LOCATIONS = {
+  phx: {
+    name: "PHX",
+    color: "#e8b84b",
+    employees: [
+      {id:1,name:"SOLEKYA", maxHours:40,stations:["C","BS"],openerOnly:false,closerOnly:false,noClose:false,availability:{Sun:true,Mon:true,Tue:true,Wed:true,Thu:true,Fri:true,Sat:true}},
+      {id:2,name:"Angie",   maxHours:40,stations:["R"],    openerOnly:false,closerOnly:false,noClose:false,availability:{Sun:false,Mon:true,Tue:true,Wed:true,Thu:true,Fri:true,Sat:true}},
+      {id:3,name:"NATASSIA",maxHours:40,stations:["R"],    openerOnly:false,closerOnly:false,noClose:false,availability:{Sun:true,Mon:true,Tue:true,Wed:true,Thu:true,Fri:true,Sat:true}},
+      {id:4,name:"SKY",     maxHours:24,stations:["R"],    openerOnly:false,closerOnly:true, noClose:false,availability:{Sun:true,Mon:true,Tue:true,Wed:true,Thu:true,Fri:true,Sat:true}},
+      {id:5,name:"SOPHIA",  maxHours:40,stations:["C","BS"],openerOnly:true,closerOnly:false,noClose:false,availability:{Sun:true,Mon:true,Tue:true,Wed:true,Thu:true,Fri:true,Sat:true}},
+      {id:6,name:"MERCEDES",maxHours:8, stations:["C","BS"],openerOnly:false,closerOnly:false,noClose:true,availability:{Sun:false,Mon:true,Tue:true,Wed:true,Thu:true,Fri:false,Sat:false}},
+      {id:7,name:"Tatum",   maxHours:40,stations:["C","R"],openerOnly:false,closerOnly:false,noClose:false,availability:{Sun:true,Mon:true,Tue:true,Wed:true,Thu:true,Fri:true,Sat:true}},
+    ]
+  },
+  mesa: {
+    name: "Mesa",
+    color: "#5c6bc0",
+    employees: [
+      {id:1,name:"FAITH",   maxHours:40,stations:["C","BS"],openerOnly:false,closerOnly:false,noClose:false,availability:{Sun:true,Mon:true,Tue:false,Wed:false,Thu:true,Fri:false,Sat:true}},
+      {id:2,name:"DESTINY", maxHours:40,stations:["R"],     openerOnly:false,closerOnly:false,noClose:false,availability:{Sun:false,Mon:true,Tue:true,Wed:true,Thu:false,Fri:true,Sat:true}},
+      {id:3,name:"LUPITA",  maxHours:40,stations:["C","R"], openerOnly:false,closerOnly:false,noClose:false,availability:{Sun:true,Mon:false,Tue:true,Wed:true,Thu:true,Fri:true,Sat:false}},
+      {id:4,name:"SEBASTIAN",maxHours:40,stations:["T","P"],openerOnly:false,closerOnly:false,noClose:false,availability:{Sun:true,Mon:false,Tue:true,Wed:false,Thu:false,Fri:true,Sat:true}},
+      {id:5,name:"Mercedes",maxHours:20,stations:["P","T"], openerOnly:false,closerOnly:false,noClose:true, availability:{Sun:true,Mon:false,Tue:false,Wed:false,Thu:false,Fri:false,Sat:false}},
+      {id:6,name:"AMANDA",  maxHours:40,stations:["R"],     openerOnly:false,closerOnly:false,noClose:false,availability:{Sun:true,Mon:true,Tue:false,Wed:true,Thu:true,Fri:false,Sat:true}},
+      {id:7,name:"MEGAN",   maxHours:20,stations:["T","C"], openerOnly:false,closerOnly:false,noClose:false,availability:{Sun:false,Mon:false,Tue:false,Wed:false,Thu:false,Fri:true,Sat:true}},
+      {id:8,name:"JASON",   maxHours:30,stations:["T","C"], openerOnly:false,closerOnly:false,noClose:false,availability:{Sun:true,Mon:false,Tue:true,Wed:false,Thu:true,Fri:false,Sat:false}},
+      {id:9,name:"ILA",     maxHours:30,stations:["R","C"], openerOnly:false,closerOnly:false,noClose:false,availability:{Sun:false,Mon:false,Tue:false,Wed:true,Thu:true,Fri:true,Sat:false}},
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let loc = "phx";
+let tab = "schedule";
+let weekStart = thisSunday();
+let schedules = {phx:{}, mesa:{}};
+let generated = {phx:false, mesa:false};
+let overrides = {phx:{}, mesa:{}};
+let editCell = null;
+let cellEdit = {start:9.5, end:16, stations:[]};
+let editingEmp = null;
+let newEmp = {name:"",maxHours:40,stations:[],openerOnly:false,closerOnly:false,noClose:false,availability:{Sun:true,Mon:true,Tue:true,Wed:true,Thu:true,Fri:true,Sat:true}};
+let showExport = false;
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function thisSunday(){const d=new Date();d.setDate(d.getDate()-d.getDay());d.setHours(0,0,0,0);return d;}
+function getWeekDates(){return Array.from({length:7},(_,i)=>{const d=new Date(weekStart);d.setDate(d.getDate()+i);return d;});}
+function fmtDate(d){return`${d.getMonth()+1}/${d.getDate()}`;}
+function fmtH(h){
+  if(h===9.5)return"9:30";
+  if(h===11.5)return"11:30";
+  if(h===21)return"C";
+  if(h===12)return"12p";
+  if(h<12)return`${h}a`;
+  return`${h===13?"1":h===14?"2":h===15?"3":h===16?"4":h===17?"5":h===18?"6":h-12}p`;
+}
+function shiftDur(s){return s?s.end-s.start:0;}
+function shiftCode(s){
+  const st=h=>h===9.5?"9:30":h===11.5?"11:30":String(h);
+  const en=h=>h===21?"C":String(h);
+  return`${st(s.start)}-${en(s.end)}-${s.stations.join("/")}`;
+}
+function chipClass(start){
+  if(start<=10)return"chip-opener";
+  if(start<=12)return"chip-mid";
+  return"chip-late";
+}
+function getEmployees(){return LOCATIONS[loc].employees;}
+function getAvail(emp,day){
+  const k=`${emp.id}_${day}`;
+  const ov=overrides[loc][k];
+  return ov!==undefined?ov:emp.availability[day];
+}
+function getShift(empId,day){return schedules[loc][`${empId}_${day}`]||null;}
+function totalHours(empId){return DAYS.reduce((s,d)=>s+shiftDur(getShift(empId,d)),0);}
+function closerCount(day){return getEmployees().filter(e=>getShift(e.id,day)?.end===CLOSE).length;}
+
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2500);
+}
+
+// ═══════════════════════════════════════════════════════════
+// AUTO-GENERATE
+// ═══════════════════════════════════════════════════════════
+// Shuffle array randomly (Fisher-Yates)
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+// Random int between min and max inclusive
+function randInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+
+function autoGen(){
+  const employees=getEmployees();
+  const sched={};
+  const used={},cnt={};
+  employees.forEach(e=>{used[e.id]=0;cnt[e.id]=0;});
+
+  // Randomly vary opener end time (4pm or 5pm) and mid end time each generation
+  const openerEnd = Math.random()>0.5 ? 16 : 17;
+  const midEnd    = Math.random()>0.5 ? 16 : 17;
+  const openerDur = openerEnd - 9.5;
+
+  DAYS.forEach(day=>{
+    const avail=employees.filter(e=>getAvail(e,day));
+    if(!avail.length)return;
+    const midStart=LATE_MID_DAYS.includes(day)?12:11;
+    const ok=(e,h)=>used[e.id]+h<=e.maxHours+1;
+
+    // ── Opener ──────────────────────────────────────────────
+    // Preferred openers: openerOnly employees + Angie/FAITH (flexible but can open)
+    // Shuffle within priority tier so a different person opens each generation
+    const opPreferred = shuffle(avail.filter(e=>
+      (e.openerOnly || e.name==="Angie" || e.name==="FAITH") && ok(e, openerDur)
+    ));
+    const opFallback = shuffle(avail.filter(e=>
+      !e.closerOnly && !opPreferred.includes(e) && ok(e, openerDur)
+    ));
+    const opener = opPreferred[0] || opFallback[0];
+    if(opener){
+      sched[`${opener.id}_${day}`]={start:9.5, end:openerEnd, stations:opener.stations.slice(0,2)};
+      used[opener.id]+=openerDur; cnt[opener.id]++;
+    }
+
+    // ── Mid ─────────────────────────────────────────────────
+    // noClose must go mid. Everyone else shuffled so different people get mid each time.
+    const midNoClose = shuffle(avail.filter(e=>
+      !sched[`${e.id}_${day}`] && e.noClose && ok(e, midEnd-midStart)
+    ));
+    const midFlexible = shuffle(avail.filter(e=>
+      !sched[`${e.id}_${day}`] && !e.openerOnly && !e.closerOnly && !e.noClose && ok(e, midEnd-midStart)
+    ));
+    const mid = midNoClose[0] || midFlexible[0];
+    if(mid){
+      sched[`${mid.id}_${day}`]={start:midStart, end:midEnd, stations:mid.stations.slice(0,2)};
+      used[mid.id]+=(midEnd-midStart); cnt[mid.id]++;
+    }
+
+    // ── Closers ─────────────────────────────────────────────
+    // closerOnly must close. Rest shuffled for variety.
+    const closerMust  = avail.filter(e=> !sched[`${e.id}_${day}`] && e.closerOnly && ok(e,5));
+    const closerFlex  = shuffle(avail.filter(e=>
+      !sched[`${e.id}_${day}`] && !e.openerOnly && !e.noClose && !e.closerOnly && ok(e,5)
+    ));
+    const closerPool  = [...closerMust, ...closerFlex];
+    // Randomly pick 4pm or 5pm close start for variety
+    const lateStart   = Math.random()>0.6 ? 17 : 16;
+    closerPool.slice(0,2).forEach(e=>{
+      sched[`${e.id}_${day}`]={start:lateStart, end:21, stations:e.stations.slice(0,2)};
+      used[e.id]+=(21-lateStart); cnt[e.id]++;
+    });
+
+    // ── Guarantee 2 closers ──────────────────────────────────
+    const cc=avail.filter(e=>sched[`${e.id}_${day}`]?.end===CLOSE).length;
+    if(cc<2){
+      const ext=avail.filter(e=>{
+        const s=sched[`${e.id}_${day}`];
+        return s&&s.end<CLOSE&&s.start>10&&!e.openerOnly&&!e.noClose;
+      });
+      if(ext.length){
+        // Pick randomly from extendable mids for variety
+        const e=shuffle(ext)[0];
+        const k=`${e.id}_${day}`;const s=sched[k];
+        sched[k]={...s,end:CLOSE};used[e.id]+=(CLOSE-s.end);
+      }
+    }
+  });
+  return sched;
+}
+
+function generate(){
+  const btn=document.getElementById("gen-btn");
+  btn.innerHTML='<span class="spin">⚙</span> Generating…';
+  btn.disabled=true;
+  setTimeout(()=>{
+    schedules[loc]=autoGen();
+    generated[loc]=true;
+    btn.innerHTML='🔀 Regenerate';
+    btn.disabled=false;
+    const msgs=["✅ New schedule ready! Tap again for a different one.","🔀 Reshuffled! Tap again for another option.","✅ New variation! Keep tapping for more.","🎲 Different schedule! Tap again to mix it up."];
+    showToast(msgs[Math.floor(Math.random()*msgs.length)]);
+    if(showExport)updateCSVPreview();
+    render();
+  },400);
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════════
+function buildCSV(){
+  const wd=getWeekDates();
+  let csv=`2 Hands ${LOCATIONS[loc].name} – Week of ${fmtDate(wd[0])} to ${fmtDate(wd[6])}\n`;
+  csv+="Name,"+DAYS.map((d,i)=>`${d} ${fmtDate(wd[i])}`).join(",")+",Total Hours\n";
+  getEmployees().forEach(emp=>{
+    csv+=[emp.name,...DAYS.map(d=>{const s=getShift(emp.id,d);return s?shiftCode(s):""}),totalHours(emp.id)+"h"].join(",")+"\n";
+  });
+  return csv;
+}
+function updateCSVPreview(){
+  const el=document.getElementById("exp-csv");
+  if(el)el.textContent=buildCSV();
+}
+function toggleExport(){
+  showExport=!showExport;
+  const p=document.getElementById("export-panel");
+  p.style.display=showExport?"block":"none";
+  if(showExport)updateCSVPreview();
+}
+function downloadCSV(){
+  const csv=buildCSV();
+  const wd=getWeekDates();
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download=`2hands_${loc}_${fmtDate(wd[0]).replace("/","-")}.csv`;
+  a.click();
+  showToast("📥 CSV downloaded!");
+}
+function copyCSV(){
+  const csv=buildCSV();
+  if(navigator.clipboard){navigator.clipboard.writeText(csv).then(()=>showToast("📋 Copied! Paste into Google Sheets"));}
+  else{const t=document.createElement("textarea");t.value=csv;document.body.appendChild(t);t.select();document.execCommand("copy");document.body.removeChild(t);showToast("📋 Copied!");}
+}
+function openPrint(){
+  const wd=getWeekDates();
+  const locName=`2 Hands ${LOCATIONS[loc].name}`;
+  const weekLabel=`${fmtDate(wd[0])} – ${fmtDate(wd[6])}, ${wd[0].getFullYear()}`;
+  const hCells=DAYS.map((d,i)=>`<th>${d}<br/><small>${fmtDate(wd[i])}</small></th>`).join("");
+  const rows=getEmployees().map(emp=>{
+    const cells=DAYS.map(d=>{const s=getShift(emp.id,d);return`<td>${s?shiftCode(s):""}</td>`;}).join("");
+    return`<tr><td><strong>${emp.name}</strong></td>${cells}<td>${totalHours(emp.id)}h</td></tr>`;
+  }).join("");
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${locName} – ${weekLabel}</title>
+<style>body{font-family:Arial,sans-serif;padding:20px;color:#111;font-size:13px}
+h2{margin:0 0 3px;font-size:16px}p{margin:0 0 12px;color:#666;font-size:11px}
+table{width:100%;border-collapse:collapse}th{background:#111;color:#fff;padding:6px 5px;text-align:center;font-size:10px;letter-spacing:1px}
+th:first-child{text-align:left;padding-left:10px}td{padding:5px;text-align:center;border:1px solid #ddd;font-size:11px}
+td:first-child{text-align:left;padding-left:10px;font-weight:bold}small{opacity:.6}
+.leg{margin-top:10px;font-size:10px;color:#888}.pbtn{margin-bottom:14px;padding:10px 24px;background:#111;color:#fff;border:none;cursor:pointer;font-size:13px}
+@media print{.pbtn{display:none}}
+</style></head><body>
+<button class="pbtn" onclick="window.print()">🖨 Print / Save as PDF</button>
+<h2>${locName} — Weekly Schedule</h2>
+<p>Week of ${weekLabel} · 9:30am–9pm · Black non-skid shoes, 2 Hands shirt & hat. Ladies hair in bun.</p>
+<table><thead><tr><th>Name</th>${hCells}<th>Hrs</th></tr></thead><tbody>${rows}</tbody></table>
+<div class="leg">C=Cashier · R=Rolling · T=Toppings · BS=Back Support · FS=Front Support · P=Prep · B=Boba · "C" as end = Close (9pm)</div>
+</body></html>`;
+  const win=window.open("","_blank");
+  if(win){win.document.write(html);win.document.close();setTimeout(()=>win.print(),500);}
+  else alert("⚠️ Pop-up blocked — please allow pop-ups and try again.");
+}
+
+// ═══════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════
+function switchLocation(l){
+  loc=l;
+  document.getElementById("btn-phx").className="loc-btn"+(l==="phx"?" active":"");
+  document.getElementById("btn-mesa").className="loc-btn"+(l==="mesa"?" active":"");
+  editingEmp=null;
+  render();
+}
+function switchTab(t){
+  tab=t;
+  document.querySelectorAll(".tab").forEach(el=>el.classList.remove("active"));
+  document.getElementById(`tab-${t}`).classList.add("active");
+  render();
+}
+function prevWeek(){const d=new Date(weekStart);d.setDate(d.getDate()-7);weekStart=d;render();}
+function nextWeek(){const d=new Date(weekStart);d.setDate(d.getDate()+7);weekStart=d;render();}
+
+// ═══════════════════════════════════════════════════════════
+// CELL EDIT
+// ═══════════════════════════════════════════════════════════
+function openEdit(empId,day){
+  const s=getShift(empId,day);
+  editCell={empId,day};
+  cellEdit=s?{start:s.start,end:s.end,stations:[...s.stations]}:{start:9.5,end:16,stations:[]};
+  renderModal();
+}
+function saveEdit(){
+  const k=`${editCell.empId}_${editCell.day}`;
+  const ns={...schedules[loc]};
+  if(!cellEdit.stations.length||cellEdit.start>=cellEdit.end){delete ns[k];}
+  else{ns[k]={start:+cellEdit.start,end:+cellEdit.end,stations:cellEdit.stations};}
+  schedules[loc]=ns;
+  editCell=null;
+  if(showExport)updateCSVPreview();
+  render();
+}
+function clearShift(){
+  const k=`${editCell.empId}_${editCell.day}`;
+  const ns={...schedules[loc]};delete ns[k];schedules[loc]=ns;
+  editCell=null;render();
+}
+function applyTpl(t){cellEdit={...cellEdit,start:t.start,end:t.end};renderModal();}
+function toggleCellStn(s){
+  const cur=cellEdit.stations;
+  cellEdit.stations=cur.includes(s)?cur.filter(x=>x!==s):[...cur,s];
+  renderModal();
+}
+
+// ═══════════════════════════════════════════════════════════
+// EMPLOYEE ACTIONS
+// ═══════════════════════════════════════════════════════════
+function updateEmp(id,field,val){
+  const emps=LOCATIONS[loc].employees;
+  const e=emps.find(e=>e.id===id);
+  if(e)e[field]=val;
+  render();
+}
+function toggleEmpStn(id,s){
+  const e=LOCATIONS[loc].employees.find(e=>e.id===id);
+  if(!e)return;
+  e.stations=e.stations.includes(s)?e.stations.filter(x=>x!==s):[...e.stations,s];
+  render();
+}
+function toggleDefAvail(id,day){
+  const e=LOCATIONS[loc].employees.find(e=>e.id===id);
+  if(!e)return;
+  e.availability[day]=!e.availability[day];
+  render();
+}
+function toggleOverride(empId,day){
+  const k=`${empId}_${day}`;
+  const emp=LOCATIONS[loc].employees.find(e=>e.id===empId);
+  const cur=getAvail(emp,day);
+  overrides[loc][k]=!cur;
+  render();
+}
+function addEmployee(){
+  if(!newEmp.name.trim())return;
+  const emps=LOCATIONS[loc].employees;
+  const id=Date.now();
+  emps.push({...JSON.parse(JSON.stringify(newEmp)),id});
+  newEmp={name:"",maxHours:40,stations:[],openerOnly:false,closerOnly:false,noClose:false,availability:{Sun:true,Mon:true,Tue:true,Wed:true,Thu:true,Fri:true,Sat:true}};
+  showToast("✅ Employee added!");
+  render();
+}
+function deleteEmployee(id){
+  LOCATIONS[loc].employees=LOCATIONS[loc].employees.filter(e=>e.id!==id);
+  const ns={...schedules[loc]};DAYS.forEach(d=>delete ns[`${id}_${d}`]);schedules[loc]=ns;
+  render();
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════
+function render(){
+  const wd=getWeekDates();
+  document.getElementById("week-label").textContent=`${fmtDate(wd[0])}–${fmtDate(wd[6])}`;
+  const main=document.getElementById("main");
+  if(tab==="schedule")main.innerHTML=renderSchedule(wd);
+  else if(tab==="employees")main.innerHTML=renderEmployees();
+  else main.innerHTML=renderAvailability(wd);
+  if(editCell)renderModal();
+}
+
+function renderSchedule(wd){
+  const employees=getEmployees();
+  const gen=generated[loc];
+
+  let html=`<div class="legend no-print">
+    <strong style="font-size:11px;color:#555;letter-spacing:.5px">SHIFTS:</strong>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--chip-opener);border-color:var(--chip-opener-b)"></span>Opener (9:30am)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--chip-mid);border-color:var(--chip-mid-b)"></span>Mid (11–12pm)</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--chip-late);border-color:var(--chip-late-b)"></span>Late/Close</div>
+  </div>
+  <div class="table-wrap">
+  <table><thead><tr><th><span class="day-name">Name</span></th>`;
+
+  DAYS.forEach((d,i)=>{
+    const cc=closerCount(d);
+    const cbClass=cc>=2?"cb-ok":cc===1?"cb-warn":"cb-bad";
+    html+=`<th><span class="day-name">${d}</span><span class="day-date">${fmtDate(wd[i])}</span>`;
+    if(gen)html+=`<div><span class="closer-badge ${cbClass}">${cc}</span></div>`;
+    html+=`</th>`;
+  });
+  html+=`<th><span class="day-name">Hrs</span></th></tr></thead><tbody>`;
+
+  employees.forEach(emp=>{
+    const hrs=totalHours(emp.id);
+    const pct=Math.min(100,(hrs/emp.maxHours)*100);
+    const over=hrs>emp.maxHours;
+    html+=`<tr>
+      <td><span class="emp-name">${emp.name}</span><span class="emp-stations">${emp.stations.join("·")}</span></td>`;
+    DAYS.forEach(day=>{
+      const avail=getAvail(emp,day);
+      const s=getShift(emp.id,day);
+      const cls=chipClass(s?s.start:0);
+      html+=`<td onclick="openEdit(${emp.id},'${day}')" style="cursor:pointer;background:${!avail?'#faf8f4':''}">`;
+      if(s){
+        html+=`<span class="chip ${cls}"><span class="chip-time">${fmtH(s.start)}–${fmtH(s.end)}</span><span class="chip-stn">${s.stations.join("/")}</span></span>`;
+      } else if(avail){
+        html+=`<span class="add-btn">+</span>`;
+      } else {
+        html+=`<span class="off-lbl">off</span>`;
+      }
+      html+=`</td>`;
+    });
+    html+=`<td class="hrs-cell">
+      <div class="hrs-num">${hrs}h</div>
+      <div class="hrs-bar"><div class="hrs-fill" style="width:${pct}%"></div></div>
+      ${over?`<div class="over-lbl">OVER</div>`:""}
+    </td></tr>`;
+  });
+
+  // Closer summary row
+  html+=`<tr class="summary-row"><td style="font-size:10px;font-weight:800;color:var(--gray);letter-spacing:1px">CLOSERS</td>`;
+  DAYS.forEach(day=>{
+    const cc=closerCount(day);
+    const cbClass=cc>=2?"cb-ok":cc===1?"cb-warn":"cb-bad";
+    html+=`<td><span class="closer-badge ${cbClass}" style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:800">${cc}</span></td>`;
+  });
+  html+=`<td></td></tr></tbody></table></div>`;
+
+  if(!gen){
+    html+=`<div style="text-align:center;padding:40px 20px;color:var(--gray)">
+      <div style="font-size:40px;margin-bottom:12px">📅</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--black);letter-spacing:1px;margin-bottom:6px">Ready to schedule</div>
+      <div style="font-size:14px;margin-bottom:20px">Hit Auto-Generate and the week is done in seconds.<br>Tap any cell to tweak a shift.</div>
+      <button class="empty-gen-btn" onclick="generate()">⚡ Auto-Generate Schedule</button>
+    </div>`;
+  }
+
+  html+=`<div class="stn-legend no-print"><strong>Stations:</strong> `;
+  html+=Object.entries(STATION_LABELS).map(([k,v])=>`<strong>${k}</strong>=${v}`).join(" · ");
+  html+=` · <strong>C</strong> as end time = Close (9pm)</div>`;
+
+  return html;
+}
+
+function renderEmployees(){
+  const employees=getEmployees();
+  let html=`<div class="sec-title">Team — 2 Hands ${LOCATIONS[loc].name}</div>`;
+
+  // Add form
+  html+=`<div class="add-form">
+    <div class="add-form-title">Add New Employee</div>
+    <div class="two-col" style="margin-bottom:10px">
+      <div class="field" style="margin:0"><label>Name</label>
+        <input type="text" value="${newEmp.name}" oninput="newEmp.name=this.value" placeholder="Full name"/></div>
+      <div class="field" style="margin:0"><label>Max Hrs/Wk</label>
+        <input type="number" value="${newEmp.maxHours}" oninput="newEmp.maxHours=+this.value"/></div>
+    </div>
+    <div class="field"><label>Shift Restriction</label>
+      <div class="toggle-row">
+        <button class="toggle-btn ${newEmp.openerOnly?"on":""}" onclick="newEmp.openerOnly=!newEmp.openerOnly;render()">Opener Only</button>
+        <button class="toggle-btn ${newEmp.closerOnly?"on":""}" onclick="newEmp.closerOnly=!newEmp.closerOnly;render()">4–Close Only</button>
+        <button class="toggle-btn ${newEmp.noClose?"on":""}" onclick="newEmp.noClose=!newEmp.noClose;render()">No Close</button>
+      </div>
+    </div>
+    <div class="field"><label>Stations</label>
+      <div class="toggle-row">${STATIONS.map(s=>`<button class="toggle-btn ${newEmp.stations.includes(s)?"on":""}" onclick="newEmp.stations.includes('${s}')?newEmp.stations=newEmp.stations.filter(x=>x!=='${s}'):newEmp.stations.push('${s}');render()">${s}</button>`).join("")}</div>
+    </div>
+    <div class="field"><label>Default Availability</label>
+      <div class="toggle-row">${DAYS.map(d=>`<button class="day-toggle ${newEmp.availability[d]?"on":""}" onclick="newEmp.availability['${d}']=!newEmp.availability['${d}'];render()">${d}</button>`).join("")}</div>
+    </div>
+    <button class="btn-add-emp" onclick="addEmployee()">+ Add Employee</button>
+  </div>
+  <div class="emp-grid">`;
+
+  employees.forEach(emp=>{
+    const hrs=totalHours(emp.id);
+    const editing=editingEmp===emp.id;
+    html+=`<div class="emp-card">
+      <div class="emp-card-header">
+        <div>
+          ${editing?`<input type="text" value="${emp.name}" oninput="updateEmp(${emp.id},'name',this.value)" style="font-family:'Bebas Neue',sans-serif;font-size:20px;border:none;border-bottom:2px solid var(--black);background:none;outline:none;width:160px"/>`:`<div class="emp-card-name">${emp.name}</div>`}
+          <div class="emp-card-meta">Max ${emp.maxHours}h/wk · ${emp.stations.join(", ")||"no stations"}
+            ${emp.openerOnly?`<span class="badge badge-opener">OPENER</span>`:""}
+            ${emp.closerOnly?`<span class="badge badge-closer">CLOSER</span>`:""}
+            ${emp.noClose?`<span class="badge badge-noclose">NO CLOSE</span>`:""}
+          </div>
+        </div>
+        <div class="card-btns">
+          <button class="card-btn" onclick="editingEmp=editingEmp===${emp.id}?null:${emp.id};render()">${editing?"Done":"Edit"}</button>
+          <button class="card-btn card-btn-del" onclick="deleteEmployee(${emp.id})">✕</button>
+        </div>
+      </div>`;
+
+    if(editing){
+      html+=`<div class="field"><label>Max Hours/Week</label>
+        <input type="number" value="${emp.maxHours}" style="max-width:100px" oninput="updateEmp(${emp.id},'maxHours',+this.value)"/></div>
+      <div class="field"><label>Shift Restriction</label>
+        <div class="toggle-row">
+          <button class="toggle-btn ${emp.openerOnly?"on":""}" onclick="updateEmp(${emp.id},'openerOnly',!${emp.openerOnly})">Opener Only</button>
+          <button class="toggle-btn ${emp.closerOnly?"on":""}" onclick="updateEmp(${emp.id},'closerOnly',!${emp.closerOnly})">4–Close Only</button>
+          <button class="toggle-btn ${emp.noClose?"on":""}" onclick="updateEmp(${emp.id},'noClose',!${emp.noClose})">No Close</button>
+        </div></div>
+      <div class="field"><label>Stations</label>
+        <div class="toggle-row">${STATIONS.map(s=>`<button class="toggle-btn ${emp.stations.includes(s)?"on":""}" onclick="toggleEmpStn(${emp.id},'${s}')">${s} ${STATION_LABELS[s]}</button>`).join("")}</div></div>
+      <div class="field"><label>Default Availability</label>
+        <div class="toggle-row">${DAYS.map(d=>`<button class="day-toggle ${emp.availability[d]?"on":""}" onclick="toggleDefAvail(${emp.id},'${d}')">${d}</button>`).join("")}</div></div>`;
+    } else {
+      html+=`<div class="avail-dots">${DAYS.map(d=>`<div class="avail-dot-wrap"><div class="avail-dot ${emp.availability[d]?"avail-on":"avail-off"}"></div><div class="avail-lbl">${d.slice(0,2)}</div></div>`).join("")}</div>`;
+    }
+    html+=`<div style="font-size:11px;color:var(--gray);margin-top:8px">This week: <strong>${hrs}h</strong></div></div>`;
+  });
+
+  html+=`</div>`;
+  return html;
+}
+
+function renderAvailability(wd){
+  const employees=getEmployees();
+  let html=`<div class="week-nav no-print" style="margin-bottom:14px">
+    <div style="font-size:13px;color:var(--gray);margin-bottom:10px">One-time overrides for this week only. <strong style="color:var(--green)">Green</strong> = available. <strong style="color:var(--gold)">Gold</strong> = overridden this week.</div>
+  </div>
+  <div class="avail-table-wrap"><table><thead><tr><th>Name</th>`;
+  DAYS.forEach((d,i)=>html+=`<th><span class="day-name">${d}</span><span class="day-date">${fmtDate(wd[i])}</span></th>`);
+  html+=`</tr></thead><tbody>`;
+  employees.forEach(emp=>{
+    html+=`<tr><td><span class="emp-name">${emp.name}</span></td>`;
+    DAYS.forEach(day=>{
+      const isOv=overrides[loc][`${emp.id}_${day}`]!==undefined;
+      const avail=getAvail(emp,day);
+      html+=`<td><button class="day-toggle ${avail?"on":""} ${isOv?"ov":""}" style="width:100%;display:flex;align-items:center;justify-content:center" onclick="toggleOverride(${emp.id},'${day}')">${avail?"✓":"✗"}</button></td>`;
+    });
+    html+=`</tr>`;
+  });
+  html+=`</tbody></table></div>
+  <div style="font-size:11px;color:var(--gray);margin-top:10px">Default availability is set in the Team tab. Overrides here only affect the current week.</div>`;
+  return html;
+}
+
+function renderModal(){
+  document.getElementById("modal-root")?.remove();
+  if(!editCell)return;
+
+  const emp=getEmployees().find(e=>e.id===editCell.empId);
+  const existing=getShift(editCell.empId,editCell.day);
+  const wd=getWeekDates();
+  const dayIdx=DAYS.indexOf(editCell.day);
+
+  const div=document.createElement("div");
+  div.id="modal-root";
+  div.innerHTML=`
+  <div class="overlay" onclick="editCell=null;render()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Edit Shift</div>
+      <div class="modal-sub">${emp?.name} · ${editCell.day} ${fmtDate(wd[dayIdx])}</div>
+      <div class="field">
+        <label>Quick Templates</label>
+        <div class="tpl-grid">
+          ${SHIFT_TEMPLATES.map(t=>{
+            const on=cellEdit.start===t.start&&cellEdit.end===t.end;
+            const cls=chipClass(t.start);
+            return`<button class="tpl-btn ${on?"on":""}" style="${on?`background:var(--chip-${cls.replace("chip-","")});font-weight:700`:""}" onclick="applyTpl({start:${t.start},end:${t.end}})">${t.desc}</button>`;
+          }).join("")}
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="field" style="margin:0">
+          <label>Start Hour</label>
+          <input type="number" min="9" max="21" step="0.5" value="${cellEdit.start}" oninput="cellEdit.start=+this.value;renderModal()"/>
+        </div>
+        <div class="field" style="margin:0">
+          <label>End Hour</label>
+          <input type="number" min="9" max="21" value="${cellEdit.end}" oninput="cellEdit.end=+this.value;renderModal()"/>
+        </div>
+      </div>
+      ${cellEdit.start<cellEdit.end?`<div style="font-size:12px;color:var(--gray);margin:8px 0 12px">${fmtH(cellEdit.start)} → ${fmtH(cellEdit.end)} · ${cellEdit.end-cellEdit.start} hours</div>`:""}
+      <div class="field">
+        <label>Stations</label>
+        <div class="toggle-row">
+          ${STATIONS.map(s=>`<button class="toggle-btn ${cellEdit.stations.includes(s)?"on":""}" onclick="toggleCellStn('${s}')">${s} ${STATION_LABELS[s]}</button>`).join("")}
+        </div>
+      </div>
+      ${cellEdit.stations.length&&cellEdit.start<cellEdit.end?`<div class="shift-preview">${shiftCode({start:cellEdit.start,end:cellEdit.end,stations:cellEdit.stations})}</div>`:""}
+      <div class="modal-actions">
+        <button class="btn-save" onclick="saveEdit()">Save Shift</button>
+        ${existing?`<button class="btn-clear" onclick="clearShift()">Clear</button>`:""}
+        <button class="btn-cancel" onclick="editCell=null;render()">Cancel</button>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(div);
+}
+
+// Boot
+render();
+</script>
+</body>
+</html>
